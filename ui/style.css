@@ -228,3 +228,16 @@ select:focus{border-color:var(--green)}
 .lic-footer{margin-top:20px;font-size:10px;color:var(--dim);border-top:1px solid var(--border);padding-top:12px}
 
 .hide{display:none!important}
+
+/* ── PRO UPSELL (locked) ── */
+.ci-p{background:rgba(245,158,11,.14)}
+.pro-card{grid-column:1/-1}
+.pro-feats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pro-locked{cursor:pointer;opacity:.75;transition:opacity .2s}
+.pro-locked:hover{opacity:1}
+.pro-feat{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:7px 8px;font-size:10px;
+  background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--rs);color:var(--muted)}
+.lock-row{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted);
+  background:var(--bg3);border:1px dashed var(--border2);border-radius:var(--rs);padding:6px 8px}
+.pro-badge{font-size:9px;font-weight:800;padding:1px 5px;border-radius:4px;white-space:nowrap;
+  background:linear-gradient(90deg,#f59e0b,#ec4899);color:#fff}

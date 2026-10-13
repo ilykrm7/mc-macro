@@ -84,6 +84,11 @@ const I18N = {
     clicking: "CLICKING...", ready: "READY", off: "OFF", bridgeOn: "PLACING (ON)",
     stLocked: "Locked", stBridging: "Bridging", stClicking: "Clicking", stReady: "Ready", stIdle: "Idle",
     pressKey: "Press a key...",
+    miniMode: "Mini mode", theme: "Theme", themesLocked: "Dark · Light · Anime · Car · Shapes",
+    proFeatures: "Pro Features", upgrade: "Upgrade to Pro", upgradeTitle: "Upgrade to Pro",
+    upgradeDesc: "This feature is available in MC-Macro Pro.", learnMore: "Learn more at kerimeksi.com", close: "Close",
+    fDelay: "Random delay (humanized)", fLoops: "Loops & conditions", fShare: "Macro export / import",
+    fHotkeys: "Global hotkeys per macro", fMini: "Mini mode", fText: "Text / keyboard macro", fThemes: "Visual themes",
   },
   tr: {
     lockMsg: "Kilitlendi — Kısayollar devre dışı", unlock: "KİLİDİ AÇ",
@@ -101,6 +106,11 @@ const I18N = {
     clicking: "TIKLIYOR...", ready: "HAZIR", off: "KAPALI", bridgeOn: "KOYUYOR (AÇIK)",
     stLocked: "Kilitlendi", stBridging: "Yol Yapılıyor", stClicking: "Tıklanıyor", stReady: "Hazır", stIdle: "Bekleniyor",
     pressKey: "Tuşa bas...",
+    miniMode: "Mini mod", theme: "Tema", themesLocked: "Koyu · Açık · Anime · Araba · Şekiller",
+    proFeatures: "Pro Özellikler", upgrade: "Pro'ya yükseltin", upgradeTitle: "Pro'ya yükseltin",
+    upgradeDesc: "Bu özellik MC-Macro Pro'da mevcut.", learnMore: "kerimeksi.com'da daha fazla bilgi", close: "Kapat",
+    fDelay: "Rastgele gecikme (insansı)", fLoops: "Döngüler ve koşullar", fShare: "Makro dışa / içe aktarma",
+    fHotkeys: "Makro başına global kısayol", fMini: "Mini mod", fText: "Metin / klavye makrosu", fThemes: "Görsel temalar",
   },
 };
 
@@ -576,3 +586,8 @@ function startUptime() {
 
 // kerimeksi.com link opens in the default browser
 (function(){var a=document.getElementById("siteLink");if(!a)return;a.addEventListener("click",function(ev){ev.preventDefault();if(window.pywebview&&window.pywebview.api&&window.pywebview.api.open_website){window.pywebview.api.open_website();}else{window.open("https://kerimeksi.com","_blank");}});})();
+
+// ── PRO UPSELL (free edition: Pro items are visible but locked) ───────────
+function showProModal() { document.getElementById("proModal").classList.remove("hide"); }
+function hideProModal() { document.getElementById("proModal").classList.add("hide"); }
+(function(){var b=document.getElementById("proLinkBtn");if(!b)return;b.addEventListener("click",function(){if(window.pywebview&&window.pywebview.api&&window.pywebview.api.open_website){window.pywebview.api.open_website();}else{window.open("https://kerimeksi.com","_blank");}});})();

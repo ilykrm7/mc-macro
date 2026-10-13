@@ -21,6 +21,7 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
+    <button class="btn-sm pro-locked" onclick="showProModal()">▣ <span data-i18n="miniMode">Mini mode</span> <span class="pro-badge">🔒 Pro</span></button>
     <div class="status-pill" id="statusPill">
       <div class="sdot" id="sdot"></div>
       <span id="statusTxt">Idle</span>
@@ -204,8 +205,29 @@
         <option value="tr">Türkçe</option>
       </select>
     </div>
+    <div class="slg">
+      <label data-i18n="theme">Theme</label>
+      <div class="pro-locked lock-row" onclick="showProModal()"><span data-i18n="themesLocked">Dark · Light · Anime · Car · Shapes</span> <span class="pro-badge">🔒 Pro</span></div>
+    </div>
     <div class="setting-row">
       <span class="setting-val hide" id="savedLbl" style="font-size:11px;color:var(--green)">✓ <span data-i18n="saved">Settings saved</span></span>
+    </div>
+  </div>
+
+  <!-- 5. PRO (locked in free edition) -->
+  <div class="card pro-card" id="proCard">
+    <div class="card-hdr">
+      <div class="card-title"><div class="cicon ci-p">⭐</div><span data-i18n="proFeatures">Pro Features</span></div>
+      <button class="btn-sm" onclick="showProModal()" data-i18n="upgrade">Upgrade to Pro</button>
+    </div>
+    <div class="pro-feats">
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fDelay">Random delay (humanized)</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fLoops">Loops & conditions</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fShare">Macro export / import</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fHotkeys">Global hotkeys per macro</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fMini">Mini mode</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fText">Text / keyboard macro</span><span class="pro-badge">🔒 Pro</span></div>
+      <div class="pro-feat pro-locked" onclick="showProModal()"><span data-i18n="fThemes">Visual themes</span><span class="pro-badge">🔒 Pro</span></div>
     </div>
   </div>
 
@@ -228,6 +250,16 @@
   <span>© <span id="copyYear">2026</span> Kerim Ekşi — <a href="https://kerimeksi.com" id="siteLink" style="color:inherit;text-decoration:underline;cursor:pointer">kerimeksi.com</a></span>
 </div>
 
+</div>
+<!-- UPGRADE MODAL -->
+<div class="lic-overlay hide" id="proModal" onclick="if(event.target===this)hideProModal()">
+  <div class="lic-modal">
+    <div class="lic-icon">⭐</div>
+    <div class="lic-title" data-i18n="upgradeTitle">Upgrade to Pro</div>
+    <div class="lic-desc" data-i18n="upgradeDesc">This feature is available in MC-Macro Pro.</div>
+    <button class="lic-btn-submit" id="proLinkBtn" data-i18n="learnMore">Learn more at kerimeksi.com</button>
+    <div class="lic-footer"><button class="btn-sm" onclick="hideProModal()" data-i18n="close">Close</button></div>
+  </div>
 </div>
 <script src="app.js"></script>
 </body>
