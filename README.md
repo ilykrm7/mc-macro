@@ -41,4 +41,4 @@ Bu yazılım "olduğu gibi" sunulur. Makro/otomatik tıklama kullanımı bazı o
 
 ## 📄 Lisans
 
-[MIT](LICENSE) © 2026 İlyas Kerim Ekşi
+[MIT](LICENSE) © 2026 Kerim Ekşi — [kerimeksi.com](https://kerimeksi.com)
