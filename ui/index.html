@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="UTF-8"/>
   <title>MC-Macro</title>
@@ -8,9 +8,6 @@
 </head>
 <body>
 <div class="app">
-
-<!-- License modal removed in free release; hidden stub keeps app.js working -->
-<div class="lic-overlay hide" id="licOverlay" style="display:none"><input type="hidden" id="licHwidVal"/><input type="hidden" id="licKeyInput"/><div id="licMsg" class="hide"></div></div>
 
 <!-- HEADER -->
 <header class="header">
@@ -24,186 +21,191 @@
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:8px">
-    <div class="lic-badge hide" id="licBadge" style="display:none"></div>
     <div class="status-pill" id="statusPill">
       <div class="sdot" id="sdot"></div>
-      <span id="statusTxt">Bekleniyor</span>
+      <span id="statusTxt">Idle</span>
     </div>
   </div>
 </header>
 
 <!-- LOCK BAR -->
 <div class="lock-bar" id="lockBar">
-  <div class="lock-msg">🔒 Kilitlendi — Hotkey devre dışı</div>
-  <button class="unlock-btn" onclick="doUnlock()">KİLİDİ AÇ</button>
+  <div class="lock-msg">🔒 <span data-i18n="lockMsg">Locked — hotkeys disabled</span></div>
+  <button class="unlock-btn" onclick="doUnlock()"><span data-i18n="unlock">UNLOCK</span></button>
 </div>
 
 <!-- MAIN (2x2 Grid) -->
 <main class="main">
 
-  <!-- 1. SOL TIK (LMB) — Burst -->
+  <!-- 1. LEFT CLICK (LMB) — Burst -->
   <div class="card" id="lmbCard">
     <div class="card-hdr">
-      <div class="card-title"><div class="cicon ci-l">⚔️</div>Sol Tık (LMB)</div>
-      <span class="burst-badge" id="lmbBadge">Çift Tıklama</span>
+      <div class="card-title"><div class="cicon ci-l">⚔️</div><span data-i18n="lmbTitle">Left Click (LMB)</span></div>
+      <span class="burst-badge" id="lmbBadge">Double Click</span>
     </div>
 
     <div class="sg">
       <div class="sg-top">
-        <span class="sg-lbl">Ek Tık / Basış</span>
-        <span class="sg-val purple" id="lmbExtraVal">1 ek tık</span>
+        <span class="sg-lbl" data-i18n="extraPerPress">Extra Clicks / Press</span>
+        <span class="sg-val purple" id="lmbExtraVal">1 extra click</span>
       </div>
       <input type="range" class="purple-thumb" id="lmbExtra" min="1" max="5" value="1" step="1"/>
     </div>
 
     <div class="sg">
       <div class="sg-top">
-        <span class="sg-lbl">Hız (CPS)</span>
+        <span class="sg-lbl" data-i18n="speed">Speed (CPS)</span>
         <span>
           <span class="sg-val" id="lmbCpsVal">14 CPS</span>
-          <span class="risk r-ok" id="lmbRisk">✓ Güvenli</span>
+          <span class="risk r-ok" id="lmbRisk">✓ Safe</span>
         </span>
       </div>
       <input type="range" id="lmbCps" min="5" max="40" value="14" step="1"/>
     </div>
 
     <div class="slg">
-      <label>Jitter (İnsan Benzeri Tıklama)</label>
+      <label data-i18n="jitter">Jitter (Human-like Clicking)</label>
       <select id="lmbJitter">
-        <option value="0">Kapalı (%0)</option>
-        <option value="1">Düşük (%8)</option>
-        <option value="2" selected>Orta (%15) — Önerilen</option>
-        <option value="3">Yüksek (%25)</option>
+        <option value="0" data-i18n="jOff">Off (0%)</option>
+        <option value="1" data-i18n="jLow">Low (8%)</option>
+        <option value="2" selected data-i18n="jMid">Medium (15%) — Recommended</option>
+        <option value="3" data-i18n="jHigh">High (25%)</option>
       </select>
     </div>
 
     <div class="hkg">
-      <label>Aktivasyon Tuşu</label>
+      <label data-i18n="hotkey">Activation Key</label>
       <div class="hkr">
         <input type="text" class="hki" id="lmbHotkey" value="y" readonly/>
-        <button class="btn-sm" id="lmbHkBtn">Değiştir</button>
+        <button class="btn-sm" id="lmbHkBtn" data-i18n="change">Change</button>
       </div>
     </div>
 
-    <button class="state-btn" id="lmbBtn" onclick="toggleLMB()">▶ Sol Tık — KAPALI</button>
+    <button class="state-btn" id="lmbBtn" onclick="toggleLMB()">▶ Left Click — OFF</button>
   </div>
 
-  <!-- 2. SAĞ TIK (RMB) — Burst -->
+  <!-- 2. RIGHT CLICK (RMB) — Burst -->
   <div class="card" id="rmbCard">
     <div class="card-hdr">
-      <div class="card-title"><div class="cicon ci-r">🖱️</div>Sağ Tık (RMB)</div>
-      <span class="burst-badge" id="rmbBadge">Çift Tıklama</span>
+      <div class="card-title"><div class="cicon ci-r">🖱️</div><span data-i18n="rmbTitle">Right Click (RMB)</span></div>
+      <span class="burst-badge" id="rmbBadge">Double Click</span>
     </div>
 
     <div class="sg">
       <div class="sg-top">
-        <span class="sg-lbl">Ek Tık / Basış</span>
-        <span class="sg-val purple" id="rmbExtraVal">1 ek tık</span>
+        <span class="sg-lbl" data-i18n="extraPerPress">Extra Clicks / Press</span>
+        <span class="sg-val purple" id="rmbExtraVal">1 extra click</span>
       </div>
       <input type="range" class="purple-thumb" id="rmbExtra" min="1" max="5" value="1" step="1"/>
     </div>
 
     <div class="sg">
       <div class="sg-top">
-        <span class="sg-lbl">Hız (CPS)</span>
+        <span class="sg-lbl" data-i18n="speed">Speed (CPS)</span>
         <span>
           <span class="sg-val blue" id="rmbCpsVal">14 CPS</span>
-          <span class="risk r-ok" id="rmbRisk">✓ Güvenli</span>
+          <span class="risk r-ok" id="rmbRisk">✓ Safe</span>
         </span>
       </div>
       <input type="range" id="rmbCps" min="5" max="40" value="14" step="1"/>
     </div>
 
     <div class="slg">
-      <label>Jitter (İnsan Benzeri Tıklama)</label>
+      <label data-i18n="jitter">Jitter (Human-like Clicking)</label>
       <select id="rmbJitter">
-        <option value="0">Kapalı (%0)</option>
-        <option value="1">Düşük (%8)</option>
-        <option value="2" selected>Orta (%15) — Önerilen</option>
-        <option value="3">Yüksek (%25)</option>
+        <option value="0" data-i18n="jOff">Off (0%)</option>
+        <option value="1" data-i18n="jLow">Low (8%)</option>
+        <option value="2" selected data-i18n="jMid">Medium (15%) — Recommended</option>
+        <option value="3" data-i18n="jHigh">High (25%)</option>
       </select>
     </div>
 
     <div class="hkg">
-      <label>Aktivasyon Tuşu</label>
+      <label data-i18n="hotkey">Activation Key</label>
       <div class="hkr">
         <input type="text" class="hki" id="rmbHotkey" value="y" readonly/>
-        <button class="btn-sm" id="rmbHkBtn">Değiştir</button>
+        <button class="btn-sm" id="rmbHkBtn" data-i18n="change">Change</button>
       </div>
     </div>
 
-    <button class="state-btn" id="rmbBtn" onclick="toggleRMB()">▶ Sağ Tık — KAPALI</button>
+    <button class="state-btn" id="rmbBtn" onclick="toggleRMB()">▶ Right Click — OFF</button>
   </div>
 
-  <!-- 3. OTO-YOL YAPICI (AUTO-BRIDGE) -->
+  <!-- 3. AUTO-BRIDGE -->
   <div class="card" id="bridgeCard">
     <div class="card-hdr">
-      <div class="card-title"><div class="cicon ci-b">🧱</div>Oto-Yol (Auto-Bridge)</div>
-      <span class="burst-badge bridge-pill">Sürekli Sağ Tık</span>
+      <div class="card-title"><div class="cicon ci-b">🧱</div><span data-i18n="bridgeTitle">Auto-Bridge</span></div>
+      <span class="burst-badge bridge-pill" data-i18n="contRight">Continuous Right Click</span>
     </div>
 
-    <div class="mode-hint">🧱 Tuşa 1 kez bas: sen tekrar basana kadar otomatik sağ tıklar (Yol)</div>
+    <div class="mode-hint">🧱 <span data-i18n="bridgeHint">Press the key once: it right-clicks automatically until you press it again</span></div>
 
     <div class="sg">
       <div class="sg-top">
-        <span class="sg-lbl">Yol Hızı (CPS Sınırı)</span>
+        <span class="sg-lbl" data-i18n="bridgeSpeed">Bridge Speed (CPS Limit)</span>
         <span>
           <span class="sg-val" style="color:#38bdf8" id="bridgeCpsVal">14 CPS</span>
-          <span class="risk r-ok" id="bridgeRisk">✓ Güvenli</span>
+          <span class="risk r-ok" id="bridgeRisk">✓ Safe</span>
         </span>
       </div>
       <input type="range" id="bridgeCps" min="5" max="40" value="14" step="1"/>
     </div>
 
     <div class="slg">
-      <label>Jitter (İnsan Benzeri Tıklama)</label>
+      <label data-i18n="jitter">Jitter (Human-like Clicking)</label>
       <select id="bridgeJitter">
-        <option value="0">Kapalı (%0)</option>
-        <option value="1">Düşük (%8)</option>
-        <option value="2" selected>Orta (%15) — Önerilen</option>
-        <option value="3">Yüksek (%25)</option>
+        <option value="0" data-i18n="jOff">Off (0%)</option>
+        <option value="1" data-i18n="jLow">Low (8%)</option>
+        <option value="2" selected data-i18n="jMid">Medium (15%) — Recommended</option>
+        <option value="3" data-i18n="jHigh">High (25%)</option>
       </select>
     </div>
 
     <div class="hkg">
-      <label>Aktivasyon Tuşu</label>
+      <label data-i18n="hotkey">Activation Key</label>
       <div class="hkr">
         <input type="text" class="hki" id="bridgeHotkey" value="r" readonly/>
-        <button class="btn-sm" id="bridgeHkBtn">Değiştir</button>
+        <button class="btn-sm" id="bridgeHkBtn" data-i18n="change">Change</button>
       </div>
     </div>
 
-    <button class="state-btn" id="bridgeBtn" onclick="toggleBridge()">▶ Oto-Yol — KAPALI</button>
+    <button class="state-btn" id="bridgeBtn" onclick="toggleBridge()">▶ Auto-Bridge — OFF</button>
   </div>
 
-  <!-- 4. GENEL AYARLAR -->
+  <!-- 4. GENERAL SETTINGS -->
   <div class="card" id="settingsCard">
     <div class="card-hdr">
-      <div class="card-title"><div class="cicon ci-s">⚙️</div>Genel Ayarlar</div>
+      <div class="card-title"><div class="cicon ci-s">⚙️</div><span data-i18n="general">General Settings</span></div>
     </div>
 
     <div class="hkg" style="margin-top:10px">
-      <label>Panik / Durdur Tuşu</label>
+      <label data-i18n="panicKey">Panic / Stop Key</label>
       <div class="hkr">
         <input type="text" class="hki" id="panicHotkey" value="f12" readonly/>
-        <button class="btn-sm" id="panicHkBtn">Değiştir</button>
+        <button class="btn-sm" id="panicHkBtn" data-i18n="change">Change</button>
       </div>
     </div>
 
     <div class="setting-row" style="margin-top:14px">
-      <span class="setting-name">Stream / Yayın Gizli Modu</span>
+      <span class="setting-name" data-i18n="streamHidden">Stream Hidden Mode</span>
       <label class="chk">
         <input type="checkbox" id="streamHidden" onchange="toggleStreamHidden()"/>
         <div class="chk-sl"></div>
       </label>
     </div>
     <div class="setting-row">
-      <span class="setting-name" style="font-size:10px;color:var(--dim)">Etkinleştirilirse Discord/OBS yayınlarında görünmez</span>
+      <span class="setting-name" style="font-size:10px;color:var(--dim)" data-i18n="streamHint">When enabled, the window is hidden from Discord/OBS screen sharing</span>
     </div>
 
-    <div class="setting-row" style="margin-top:12px">
-      <span class="setting-name">Ayarlar Durumu</span>
-      <span class="setting-val" id="autoSaveLbl" style="font-size:11px;color:var(--green)">✓ Otomatik kaydediliyor</span>
+    <div class="slg" style="margin-top:12px">
+      <label data-i18n="language">Language</label>
+      <select id="langSel">
+        <option value="en">English</option>
+        <option value="tr">Türkçe</option>
+      </select>
+    </div>
+    <div class="setting-row">
+      <span class="setting-val hide" id="savedLbl" style="font-size:11px;color:var(--green)">✓ <span data-i18n="saved">Settings saved</span></span>
     </div>
   </div>
 
@@ -211,12 +213,12 @@
 
 <!-- FOOTER -->
 <footer class="footer">
-  <button class="panic-btn" onclick="doPanic()">🛑 DURDUR</button>
+  <button class="panic-btn" onclick="doPanic()">🛑 <span data-i18n="stop">STOP</span></button>
   <div class="hk-summary" id="hkSummary">
-    <span class="hk-item"><kbd class="hk-key">Y</kbd>Sol Tık</span>
-    <span class="hk-item"><kbd class="hk-key">Y</kbd>Sağ Tık</span>
-    <span class="hk-item"><kbd class="hk-key">R</kbd>Oto-Yol</span>
-    <span class="hk-item"><kbd class="hk-key">F12</kbd>Durdur</span>
+    <span class="hk-item"><kbd class="hk-key">Y</kbd>Left Click</span>
+    <span class="hk-item"><kbd class="hk-key">Y</kbd>Right Click</span>
+    <span class="hk-item"><kbd class="hk-key">R</kbd>Auto-Bridge</span>
+    <span class="hk-item"><kbd class="hk-key">F12</kbd>Stop</span>
   </div>
   <div class="footer-up" id="uptime">⏱ 00:00</div>
 </footer>

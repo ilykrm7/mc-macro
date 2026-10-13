@@ -17,6 +17,7 @@ DEFAULT_SETTINGS = {
     "bridge": {"cps": 14, "jitter": 2, "hold_ms": 28},
     "hotkeys": {"lmb": "f6", "rmb": "f7", "bridge": "r", "panic": "f12"},
     "stream_hidden": False,
+    "language": "en",
 }
 
 

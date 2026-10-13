@@ -1,17 +1,17 @@
 "use strict";
 /*
  * MC-Macro — UI Logic
- * 1. Sol Tık (LMB) — Burst
- * 2. Sağ Tık (RMB) — Burst
- * 3. Oto-Yol (Bridge) — Continuous Right Click
- * Multi-target shared hotkeys and offline HWID licensing
+ * 1. Left Click (LMB) — Burst
+ * 2. Right Click (RMB) — Burst
+ * 3. Auto-Bridge — Continuous Right Click
+ * Multi-target shared hotkeys, EN/TR UI
  */
 
 let lmbState        = "off"; // "off" | "armed" | "clicking"
 let rmbState        = "off";
 let bridgeState     = "off";
 let panicLocked     = false;
-let isLicensed      = false;
+let lang            = "en";
 let listenKey       = null;
 let applyTimer      = null;
 let startTime       = Date.now();
@@ -19,7 +19,6 @@ let backendInitDone = false;
 
 // ── FAST BACKEND INIT ───────────────────────────────────────────────────
 window.onBackendLoaded = function(lic, s) {
-  if (lic) handleLicenseStatus(typeof lic === "string" ? JSON.parse(lic) : lic);
   if (s)   loadSettingsIntoUI(typeof s === "string" ? JSON.parse(s) : s);
   backendInitDone = true;
 };
@@ -29,10 +28,6 @@ async function tryInitFromApi() {
   if (backendInitDone) return true;
   if (!window.pywebview || !window.pywebview.api) return false;
   try {
-    const rawLic = await pywebview.api.get_license_info();
-    const lic    = typeof rawLic === "string" ? JSON.parse(rawLic) : rawLic;
-    handleLicenseStatus(lic);
-
     const raw = await pywebview.api.get_initial_settings();
     const s   = typeof raw === "string" ? JSON.parse(raw) : raw;
     loadSettingsIntoUI(s);
@@ -57,7 +52,8 @@ window.addEventListener("pywebviewready", tryInitFromApi);
 window.addEventListener("DOMContentLoaded", () => {
   bindSliders();
   bindHotkeys();
-  bindLicenseEvents();
+  bindLanguage();
+  applyLang();
   tryInitFromApi();
   startPoll();
   startUptime();
@@ -70,101 +66,66 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-// ── LICENSE HANDLING ─────────────────────────────────────────────────────
-function handleLicenseStatus(lic) {
-  if (!lic) return;
-  isLicensed = !!lic.licensed;
-  const overlay = document.getElementById("licOverlay");
-  const badge   = document.getElementById("licBadge");
-  const hwidVal = document.getElementById("licHwidVal");
+// ── I18N (EN default / TR) ───────────────────────────────────────────────
+const I18N = {
+  en: {
+    lockMsg: "Locked — hotkeys disabled", unlock: "UNLOCK",
+    lmbTitle: "Left Click (LMB)", rmbTitle: "Right Click (RMB)", bridgeTitle: "Auto-Bridge",
+    extraPerPress: "Extra Clicks / Press", speed: "Speed (CPS)", bridgeSpeed: "Bridge Speed (CPS Limit)",
+    jitter: "Jitter (Human-like Clicking)", jOff: "Off (0%)", jLow: "Low (8%)", jMid: "Medium (15%) — Recommended", jHigh: "High (25%)",
+    hotkey: "Activation Key", change: "Change", contRight: "Continuous Right Click",
+    bridgeHint: "Press the key once: it right-clicks automatically until you press it again",
+    general: "General Settings", panicKey: "Panic / Stop Key", streamHidden: "Stream Hidden Mode",
+    streamHint: "When enabled, the window is hidden from Discord/OBS screen sharing",
+    language: "Language", saved: "Settings saved", stop: "STOP", stopShort: "Stop",
+    oneExtra: "1 extra click", nExtra: (n) => n + " extra clicks", double: "Double Click",
+    safe: "✓ Safe", caution: "⚠ Caution", risk: "🔴 Risk",
+    lmb: "Left Click", rmb: "Right Click", bridge: "Auto-Bridge",
+    clicking: "CLICKING...", ready: "READY", off: "OFF", bridgeOn: "PLACING (ON)",
+    stLocked: "Locked", stBridging: "Bridging", stClicking: "Clicking", stReady: "Ready", stIdle: "Idle",
+    pressKey: "Press a key...",
+  },
+  tr: {
+    lockMsg: "Kilitlendi — Kısayollar devre dışı", unlock: "KİLİDİ AÇ",
+    lmbTitle: "Sol Tık (LMB)", rmbTitle: "Sağ Tık (RMB)", bridgeTitle: "Oto-Yol (Auto-Bridge)",
+    extraPerPress: "Ek Tık / Basış", speed: "Hız (CPS)", bridgeSpeed: "Yol Hızı (CPS Sınırı)",
+    jitter: "Jitter (İnsan Benzeri Tıklama)", jOff: "Kapalı (%0)", jLow: "Düşük (%8)", jMid: "Orta (%15) — Önerilen", jHigh: "Yüksek (%25)",
+    hotkey: "Aktivasyon Tuşu", change: "Değiştir", contRight: "Sürekli Sağ Tık",
+    bridgeHint: "Tuşa 1 kez bas: sen tekrar basana kadar otomatik sağ tıklar",
+    general: "Genel Ayarlar", panicKey: "Panik / Durdur Tuşu", streamHidden: "Yayında Gizli Mod",
+    streamHint: "Etkinleştirilirse Discord/OBS ekran paylaşımında pencere görünmez",
+    language: "Dil", saved: "Ayarlar kaydedildi", stop: "DURDUR", stopShort: "Durdur",
+    oneExtra: "1 ek tık", nExtra: (n) => n + " ek tık", double: "Çift Tıklama",
+    safe: "✓ Güvenli", caution: "⚠ Dikkat", risk: "🔴 Risk",
+    lmb: "Sol Tık", rmb: "Sağ Tık", bridge: "Oto-Yol",
+    clicking: "TIKLIYOR...", ready: "HAZIR", off: "KAPALI", bridgeOn: "KOYUYOR (AÇIK)",
+    stLocked: "Kilitlendi", stBridging: "Yol Yapılıyor", stClicking: "Tıklanıyor", stReady: "Hazır", stIdle: "Bekleniyor",
+    pressKey: "Tuşa bas...",
+  },
+};
 
-  if (lic.hwid) {
-    hwidVal.value = lic.hwid;
-  }
-
-  if (isLicensed) {
-    overlay.classList.add("hide");
-    badge.classList.remove("hide");
-  } else {
-    overlay.classList.remove("hide");
-    badge.classList.add("hide");
-  }
+function t(key, arg) {
+  const v = (I18N[lang] && I18N[lang][key]) ?? I18N.en[key] ?? key;
+  return typeof v === "function" ? v(arg) : v;
 }
 
-function bindLicenseEvents() {
-  const keyInput = document.getElementById("licKeyInput");
-  if (keyInput) {
-    keyInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        submitLicense();
-      }
-    });
-  }
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = t(el.dataset.i18n); });
+  refreshExtra("lmb"); refreshExtra("rmb");
+  refreshCps("lmb"); refreshCps("rmb"); refreshBridgeCps();
+  setLmbVisual(lmbState); setRmbVisual(rmbState); setBridgeVisual(bridgeState);
+  updateHkSummary();
 }
 
-function copyHwid() {
-  const el  = document.getElementById("licHwidVal");
-  const btn = document.getElementById("licCopyBtn");
-  if (!el.value || el.value.startsWith("Yükleniyor")) return;
-
-  navigator.clipboard.writeText(el.value).then(() => {
-    btn.textContent = "✓ Kopyalandı!";
-    btn.style.color = "var(--green)";
-    setTimeout(() => {
-      btn.textContent = "📋 Kopyala";
-      btn.style.color = "";
-    }, 1800);
-  }).catch(() => {
-    el.select();
-    document.execCommand("copy");
-    btn.textContent = "✓ Kopyalandı!";
-    setTimeout(() => { btn.textContent = "📋 Kopyala"; }, 1800);
+function bindLanguage() {
+  const sel = document.getElementById("langSel");
+  sel.value = lang;
+  sel.addEventListener("change", () => {
+    lang = sel.value === "tr" ? "tr" : "en";
+    applyLang();
+    debouncedApply();
   });
-}
-
-async function submitLicense() {
-  const input = document.getElementById("licKeyInput");
-  const key   = input.value.trim();
-  const msgEl = document.getElementById("licMsg");
-
-  if (!key) {
-    msgEl.className = "lic-status-msg error";
-    msgEl.textContent = "Lütfen lisans anahtarınızı giriniz!";
-    msgEl.classList.remove("hide");
-    return;
-  }
-
-  if (!window.pywebview || !window.pywebview.api) {
-    msgEl.className = "lic-status-msg error";
-    msgEl.textContent = "Uygulama API bağlantısı bekleniyor...";
-    msgEl.classList.remove("hide");
-    return;
-  }
-
-  try {
-    const rawRes = await pywebview.api.activate_license(key);
-    const res    = typeof rawRes === "string" ? JSON.parse(rawRes) : rawRes;
-
-    if (res.ok) {
-      isLicensed = true;
-      msgEl.className = "lic-status-msg success";
-      msgEl.textContent = res.message;
-      msgEl.classList.remove("hide");
-      setTimeout(() => {
-        document.getElementById("licOverlay").classList.add("hide");
-        document.getElementById("licBadge").classList.remove("hide");
-      }, 1200);
-    } else {
-      msgEl.className = "lic-status-msg error";
-      msgEl.textContent = res.message;
-      msgEl.classList.remove("hide");
-    }
-  } catch(e) {
-    msgEl.className = "lic-status-msg error";
-    msgEl.textContent = "Doğrulama hatası: " + e;
-    msgEl.classList.remove("hide");
-  }
 }
 
 // ── LOAD SETTINGS INTO UI ────────────────────────────────────────────────
@@ -205,6 +166,13 @@ function loadSettingsIntoUI(s) {
     document.getElementById("streamHidden").checked = s.stream_hidden;
   }
 
+  // Language
+  if (s.language === "en" || s.language === "tr") {
+    lang = s.language;
+    document.getElementById("langSel").value = lang;
+    applyLang();
+  }
+
   updateHkSummary();
 }
 
@@ -233,10 +201,10 @@ function refreshExtra(side) {
   const badgeEl = document.getElementById(side + "Badge");
 
   if (n === 1) {
-    valEl.textContent = "1 ek tık";
-    if (badgeEl) badgeEl.textContent = "Çift Tıklama";
+    valEl.textContent = t("oneExtra");
+    if (badgeEl) badgeEl.textContent = t("double");
   } else {
-    valEl.textContent = n + " ek tık";
+    valEl.textContent = t("nExtra", n);
     if (badgeEl) badgeEl.textContent = (n + 1) + "x Burst";
   }
 }
@@ -253,14 +221,14 @@ function refreshCps(side) {
 
   if (v <= 16) {
     risk.classList.add("r-ok");
-    risk.textContent = "✓ Güvenli";
+    risk.textContent = t("safe");
   } else if (v <= 26) {
     risk.classList.add("r-warn");
-    risk.textContent = "⚠ Dikkat";
+    risk.textContent = t("caution");
     sl.className = "warn";
   } else {
     risk.classList.add("r-bad");
-    risk.textContent = "🔴 Risk";
+    risk.textContent = t("risk");
     sl.className = "danger";
   }
 }
@@ -277,14 +245,14 @@ function refreshBridgeCps() {
 
   if (v <= 16) {
     risk.classList.add("r-ok");
-    risk.textContent = "✓ Güvenli";
+    risk.textContent = t("safe");
   } else if (v <= 26) {
     risk.classList.add("r-warn");
-    risk.textContent = "⚠ Dikkat";
+    risk.textContent = t("caution");
     sl.className = "warn";
   } else {
     risk.classList.add("r-bad");
-    risk.textContent = "🔴 Risk";
+    risk.textContent = t("risk");
     sl.className = "danger";
   }
 }
@@ -316,13 +284,14 @@ function collectSettings() {
       panic:  document.getElementById("panicHotkey").value.trim().toLowerCase(),
     },
     stream_hidden: document.getElementById("streamHidden").checked,
+    language:      lang,
   };
 }
 
 function debouncedApply() {
   clearTimeout(applyTimer);
   applyTimer = setTimeout(async () => {
-    if (!window.pywebview || !isLicensed) return;
+    if (!window.pywebview) return;
     try {
       await pywebview.api.apply_settings(JSON.stringify(collectSettings()));
       flashSaved();
@@ -331,18 +300,16 @@ function debouncedApply() {
 }
 
 function flashSaved() {
-  const el = document.getElementById("autoSaveLbl");
+  const el = document.getElementById("savedLbl");
   if (!el) return;
-  el.textContent = "✓ Kaydedildi";
-  el.style.color = "var(--green)";
-  setTimeout(() => {
-    if (el) el.textContent = "✓ Otomatik kaydediliyor";
-  }, 1800);
+  el.classList.remove("hide");
+  clearTimeout(flashSaved._t);
+  flashSaved._t = setTimeout(() => el.classList.add("hide"), 1800);
 }
 
 // ── TOGGLE STATE ─────────────────────────────────────────────────────────
 async function toggleLMB() {
-  if (panicLocked || !isLicensed) return;
+  if (panicLocked) return;
   const next = lmbState === "off";
   if (window.pywebview) {
     await pywebview.api.arm_lmb(next);
@@ -352,7 +319,7 @@ async function toggleLMB() {
 }
 
 async function toggleRMB() {
-  if (panicLocked || !isLicensed) return;
+  if (panicLocked) return;
   const next = rmbState === "off";
   if (window.pywebview) {
     await pywebview.api.arm_rmb(next);
@@ -362,7 +329,7 @@ async function toggleRMB() {
 }
 
 async function toggleBridge() {
-  if (panicLocked || !isLicensed) return;
+  if (panicLocked) return;
   const next = bridgeState === "off";
   if (window.pywebview) {
     await pywebview.api.arm_bridge(next);
@@ -380,14 +347,14 @@ function setLmbVisual(st) {
 
   if (st === "clicking") {
     btn.classList.add("s-clicking");
-    btn.textContent = "🟢 Sol Tık — TIKLIYOR...";
+    btn.textContent = "🟢 " + t("lmb") + " — " + t("clicking");
     card.classList.add("s-clicking");
   } else if (st === "armed") {
     btn.classList.add("s-armed");
-    btn.textContent = "🟡 Sol Tık — HAZIR";
+    btn.textContent = "🟡 " + t("lmb") + " — " + t("ready");
     card.classList.add("s-armed");
   } else {
-    btn.textContent = "▶ Sol Tık — KAPALI";
+    btn.textContent = "▶ " + t("lmb") + " — " + t("off");
   }
   updateGlobalPill();
 }
@@ -401,14 +368,14 @@ function setRmbVisual(st) {
 
   if (st === "clicking") {
     btn.classList.add("s-clicking");
-    btn.textContent = "🟢 Sağ Tık — TIKLIYOR...";
+    btn.textContent = "🟢 " + t("rmb") + " — " + t("clicking");
     card.classList.add("s-clicking");
   } else if (st === "armed") {
     btn.classList.add("s-armed");
-    btn.textContent = "🟡 Sağ Tık — HAZIR";
+    btn.textContent = "🟡 " + t("rmb") + " — " + t("ready");
     card.classList.add("s-armed");
   } else {
-    btn.textContent = "▶ Sağ Tık — KAPALI";
+    btn.textContent = "▶ " + t("rmb") + " — " + t("off");
   }
   updateGlobalPill();
 }
@@ -422,10 +389,10 @@ function setBridgeVisual(st) {
 
   if (st === "armed" || st === "clicking") {
     btn.classList.add("s-clicking");
-    btn.textContent = "🟢 Oto-Yol — KOYUYOR (AÇIK)";
+    btn.textContent = "🟢 " + t("bridge") + " — " + t("bridgeOn");
     card.classList.add("s-clicking");
   } else {
-    btn.textContent = "▶ Oto-Yol — KAPALI";
+    btn.textContent = "▶ " + t("bridge") + " — " + t("off");
   }
   updateGlobalPill();
 }
@@ -441,21 +408,21 @@ function updateGlobalPill() {
   if (panicLocked) {
     pill.classList.add("locked");
     sdot.classList.add("locked");
-    txt.textContent = "Kilitlendi";
+    txt.textContent = t("stLocked");
   } else if (bridgeState === "armed" || bridgeState === "clicking") {
     pill.classList.add("active");
     sdot.classList.add("active");
-    txt.textContent = "Yol Yapılıyor";
+    txt.textContent = t("stBridging");
   } else if (lmbState === "clicking" || rmbState === "clicking") {
     pill.classList.add("active");
     sdot.classList.add("active");
-    txt.textContent = "Tıklanıyor";
+    txt.textContent = t("stClicking");
   } else if (lmbState === "armed" || rmbState === "armed") {
     pill.classList.add("armed");
     sdot.classList.add("armed");
-    txt.textContent = "Hazır";
+    txt.textContent = t("stReady");
   } else {
-    txt.textContent = "Bekleniyor";
+    txt.textContent = t("stIdle");
   }
 }
 
@@ -464,10 +431,6 @@ window.onStatusUpdate = function(s) {
   if (!s) return;
   panicLocked = !!s.panic_locked;
   document.getElementById("lockBar").classList.toggle("show", panicLocked);
-
-  if (s.is_licensed !== undefined) {
-    handleLicenseStatus({ licensed: s.is_licensed });
-  }
 
   if (panicLocked) {
     setLmbVisual("off");
@@ -549,7 +512,7 @@ function startListenKey(target) {
   };
   const input = document.getElementById(idMap[target]);
   input.classList.add("listening");
-  input.value = "Tuşa bas...";
+  input.value = t("pressKey");
 }
 
 function stopListenKey(key) {
@@ -578,10 +541,10 @@ function updateHkSummary() {
   const el = document.getElementById("hkSummary");
   if (!el) return;
   el.innerHTML = `
-    <span class="hk-item"><kbd class="hk-key">${lmb}</kbd>Sol Tık</span>
-    <span class="hk-item"><kbd class="hk-key">${rmb}</kbd>Sağ Tık</span>
-    <span class="hk-item"><kbd class="hk-key">${bridge}</kbd>Oto-Yol</span>
-    <span class="hk-item"><kbd class="hk-key">${panic}</kbd>Durdur</span>
+    <span class="hk-item"><kbd class="hk-key">${lmb}</kbd>${t("lmb")}</span>
+    <span class="hk-item"><kbd class="hk-key">${rmb}</kbd>${t("rmb")}</span>
+    <span class="hk-item"><kbd class="hk-key">${bridge}</kbd>${t("bridge")}</span>
+    <span class="hk-item"><kbd class="hk-key">${panic}</kbd>${t("stopShort")}</span>
   `;
 }
 
@@ -608,8 +571,8 @@ function startUptime() {
   }, 1000);
 }
 
-// Telif yılı: bilgisayarın tarihinden otomatik
+// Copyright year: automatic from system date
 (function(){var e=document.getElementById("copyYear");if(e)e.textContent=new Date().getFullYear();})();
 
-// kerimeksi.com bağlantısı varsayılan tarayıcıda açılır
+// kerimeksi.com link opens in the default browser
 (function(){var a=document.getElementById("siteLink");if(!a)return;a.addEventListener("click",function(ev){ev.preventDefault();if(window.pywebview&&window.pywebview.api&&window.pywebview.api.open_website){window.pywebview.api.open_website();}else{window.open("https://kerimeksi.com","_blank");}});})();

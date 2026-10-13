@@ -1,5 +1,7 @@
 # MC-Macro
 
+> **English:** Free, open-source mouse macro for Windows (MIT). The interface is available in **English (default) and Turkish** — switch it under *General Settings → Language*. Install: `pip install -r requirements.txt`, run: `python main.py`, build: `build.bat`.
+
 Windows için ücretsiz ve açık kaynaklı fare makro uygulaması. Python + pywebview ile yazılmıştır; arayüz HTML/CSS/JS'dir.
 
 ## ⚡ Özellikler
@@ -10,6 +12,7 @@ Windows için ücretsiz ve açık kaynaklı fare makro uygulaması. Python + pyw
 - **Ortak / bağımsız kısayol tuşları:** Varsayılanlar: `F6` sol tık, `F7` sağ tık, `R` oto-yol, `F12` panik.
 - **Yayıncı Gizleme:** OBS / Discord ekran paylaşımında pencere görünmez (Windows 10 2004+).
 - **Panik Kilidi (F12):** Tek tuşla tüm makroları durdurur.
+- **İki dil (EN / TR):** Arayüz varsayılan olarak İngilizce; *General Settings → Language* bölümünden Türkçe seçilebilir, yeniden başlatmadan anında değişir ve seçim kaydedilir.
 - Ayarlar otomatik olarak `%APPDATA%\MC-Macro\settings.json` dosyasına kaydedilir.
 
 ## 📋 Gereksinimler
