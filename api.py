@@ -204,7 +204,7 @@ class MacroAPI:
 
     def open_pro_page(self) -> str:
         import webbrowser
-        webbrowser.open("https://kerimeksi.com/macro")
+        webbrowser.open("https://kerimeksi.com/mcmacro")
         return "ok"
 
     def open_website(self) -> str:
