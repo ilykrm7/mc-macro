@@ -610,3 +610,6 @@ function startUptime() {
 
 // Telif yılı: bilgisayarın tarihinden otomatik
 (function(){var e=document.getElementById("copyYear");if(e)e.textContent=new Date().getFullYear();})();
+
+// kerimeksi.com bağlantısı varsayılan tarayıcıda açılır
+(function(){var a=document.getElementById("siteLink");if(!a)return;a.addEventListener("click",function(ev){ev.preventDefault();if(window.pywebview&&window.pywebview.api&&window.pywebview.api.open_website){window.pywebview.api.open_website();}else{window.open("https://kerimeksi.com","_blank");}});})();

@@ -201,6 +201,11 @@ class MacroAPI:
 
     # ── STATUS (licensing removed in free release) ─────────────────────
 
+    def open_website(self) -> str:
+        import webbrowser
+        webbrowser.open("https://kerimeksi.com")
+        return "ok"
+
     def get_license_info(self) -> str:
         """Kept for UI compatibility; the app is always unlocked."""
         return json.dumps({"licensed": True, "hwid": ""})
