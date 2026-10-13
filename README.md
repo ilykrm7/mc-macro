@@ -38,6 +38,18 @@ build.bat
 
 Çıktı: `dist\MC-Macro.exe` (PyInstaller, tek dosya). Alternatif olarak: `pyinstaller MC-Macro.spec`.
 
+## 🔒 Safe download / Güvenli indirme
+
+**EN:** Download `MC-Macro.exe` only from the official [GitHub Releases](https://github.com/ilykrm7/mc-macro/releases) page. Each release includes a `MC-Macro.exe.sha256` file. Verify in PowerShell:
+
+**TR:** `MC-Macro.exe` dosyasını yalnızca resmi [GitHub Releases](https://github.com/ilykrm7/mc-macro/releases) sayfasından indirin. Her sürüm bir `MC-Macro.exe.sha256` dosyası içerir. PowerShell ile doğrulayın:
+
+```powershell
+Get-FileHash .\MC-Macro.exe -Algorithm SHA256
+```
+
+The hash must match the `.sha256` file. / Çıkan değer `.sha256` dosyasındakiyle aynı olmalıdır. Windows SmartScreen may warn because the exe is not code-signed; choose "More info → Run anyway". / Exe imzalı olmadığı için SmartScreen uyarı verebilir; "Ek bilgi → Yine de çalıştır" seçin.
+
 ## ⚠️ Sorumluluk Reddi
 
 Bu yazılım "olduğu gibi" sunulur. Makro/otomatik tıklama kullanımı bazı oyunların veya platformların kurallarına aykırı olabilir; kullanım sorumluluğu kullanıcıya aittir.
