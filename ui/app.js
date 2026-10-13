@@ -607,3 +607,6 @@ function startUptime() {
     if (el) el.textContent = `⏱ ${m}:${s}`;
   }, 1000);
 }
+
+// Telif yılı: bilgisayarın tarihinden otomatik
+(function(){var e=document.getElementById("copyYear");if(e)e.textContent=new Date().getFullYear();})();
