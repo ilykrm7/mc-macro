@@ -202,6 +202,11 @@ class MacroAPI:
 
     # ── STATUS (licensing removed in free release) ─────────────────────
 
+    def open_pro_page(self) -> str:
+        import webbrowser
+        webbrowser.open("https://kerimeksi.com/macro")
+        return "ok"
+
     def open_website(self) -> str:
         import webbrowser
         webbrowser.open("https://kerimeksi.com")
