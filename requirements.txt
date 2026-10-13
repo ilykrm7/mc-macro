@@ -1,0 +1,4 @@
+pynput
+pywebview
+pywin32
+pyinstaller

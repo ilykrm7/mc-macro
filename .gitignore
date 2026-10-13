@@ -1,0 +1,13 @@
+build/
+dist/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.cursor/
+*.log
+settings.json
+license.dat
+.vscode/
+.idea/
+Thumbs.db
